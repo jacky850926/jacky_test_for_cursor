@@ -52,6 +52,16 @@
                     </select>
                 </div>
                 <div>
+                    <label for="account">帳戶：</label>
+                    <select id="transaction-account" name="account" required>
+                        <!-- 帳戶選項將由 JavaScript 動態載入 -->
+                    </select>
+                    <div class="custom-category-adder" id="account-adder-container">
+                        <input type="text" id="new-account-input" placeholder="或輸入新帳戶名稱">
+                        <button type="button" id="add-new-account-btn" class="small-btn">新增帳戶</button>
+                    </div>
+                </div>
+                <div>
                     <label for="description">描述：</label>
                     <input type="text" id="description" name="description" placeholder="例如：午餐" required>
                 </div>

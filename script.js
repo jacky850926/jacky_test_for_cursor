@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const newCategoryInput = document.getElementById('new-category-input');
     const addNewCategoryBtn = document.getElementById('add-new-category-btn');
 
+    const transactionAccountSelect = document.getElementById('transaction-account');
+    const newAccountInput = document.getElementById('new-account-input');
+    const addNewAccountBtn = document.getElementById('add-new-account-btn');
+
     // Set default date to today
     dateInput.valueAsDate = new Date();
 
@@ -34,6 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let primaryCurrency = localStorage.getItem('primaryCurrency') || 'TWD'; // Load primary currency, default TWD
     let latestRates = {}; // To cache fetched rates for conversions
     let customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
+    let accounts = JSON.parse(localStorage.getItem('accounts')) || [];
 
     function saveTransactions() {
         localStorage.setItem('transactions', JSON.stringify(transactions));
@@ -47,6 +52,30 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('customCategories', JSON.stringify(customCategories));
     }
 
+    function saveAccounts() {
+        localStorage.setItem('accounts', JSON.stringify(accounts));
+    }
+
+    function populateAccountSelector() {
+        if (!transactionAccountSelect) return;
+        transactionAccountSelect.innerHTML = ''; // Clear existing
+        accounts.forEach(accountName => {
+            const option = document.createElement('option');
+            option.value = accountName;
+            option.textContent = accountName;
+            transactionAccountSelect.appendChild(option);
+        });
+        // Set a default if no account is selected or if the list is empty
+        if (transactionAccountSelect.options.length > 0) {
+            if (!transactionAccountSelect.value) {
+                 transactionAccountSelect.value = transactionAccountSelect.options[0].value;
+            }
+        } else {
+            // Optionally add a placeholder or a default like "Default Account"
+            // For now, it will be empty if no accounts are added.
+        }
+    }
+
     function addTransactionDOM(transaction) {
         const item = document.createElement('li');
         item.classList.add(transaction.type);
@@ -55,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const amountClass = transaction.type === 'income' ? 'income-amount' : 'expense-amount';
 
         item.innerHTML = `
+            <span class="account-display">[${transaction.account}]</span>
             <span class="description">${transaction.description}</span>
             <span class="amount ${amountClass}">${transaction.currency} ${transaction.type === 'income' ? '' : '-'}${Math.abs(transaction.amount).toLocaleString()}</span>
             <span class="date">${transaction.date}</span>
@@ -189,9 +219,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const amount = parseFloat(document.getElementById('amount').value);
         const date = document.getElementById('date').value;
         const currency = transactionCurrencySelect.value;
+        const account = transactionAccountSelect.value;
 
-        if (description.trim() === '' || isNaN(amount) || date === '' || currency === '') {
-            alert('請填寫所有欄位，包括幣種');
+        if (description.trim() === '' || isNaN(amount) || date === '' || currency === '' || account === '') {
+            alert('請填寫所有欄位，包括帳戶和幣種');
             return;
         }
 
@@ -199,8 +230,9 @@ document.addEventListener('DOMContentLoaded', () => {
             id: generateID(),
             type: type,
             description: description,
-            amount: type === 'income' ? amount : -amount, // Store expense as negative
-            currency: currency,
+            amount: type === 'income' ? amount : -amount, 
+            currency: currency, 
+            account: account,
             date: date
         };
 
@@ -211,6 +243,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         transactionForm.reset();
         dateInput.valueAsDate = new Date(); // Reset date to today after submission
+        // Ensure transaction currency defaults back to primary currency after form reset
+        if (transactionCurrencySelect && primaryCurrency && Array.from(transactionCurrencySelect.options).find(opt => opt.value === primaryCurrency)) {
+            transactionCurrencySelect.value = primaryCurrency;
+        } else if (transactionCurrencySelect && transactionCurrencySelect.options.length > 0 && allCurrencyOptions['TWD']) {
+            transactionCurrencySelect.value = 'TWD'; // Fallback to TWD if primary not found or not set
+        } else if (transactionCurrencySelect && transactionCurrencySelect.options.length > 0) {
+             transactionCurrencySelect.value = transactionCurrencySelect.options[0].value; // Fallback to first if TWD not found
+        }
+
+        // Populate accounts selector
+        populateAccountSelector();
     }
 
     function generateID() {
@@ -302,10 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // This case should be rare if API call succeeds or custom categories exist.
             }
 
-            // Fetch initial rates for the default selected currency
-            if (baseCurrencySelector.value) {
-                fetchAndDisplayRates(baseCurrencySelector.value);
-            }
+            // populateAccountSelector(); // This was correctly called once during overall initialization (e.g. in init() or DOMContentLoaded)
 
         } catch (error) {
             console.error("獲取貨幣時發生錯誤:", error);
@@ -425,6 +465,26 @@ document.addEventListener('DOMContentLoaded', () => {
             transactionCurrencySelect.value = newCategoryName;
             newCategoryInput.value = ''; // Clear input
             alert(`自訂類別 '${newCategoryName}' 已新增。`);
+        });
+    }
+
+    if (addNewAccountBtn && newAccountInput) {
+        addNewAccountBtn.addEventListener('click', () => {
+            const newAccountName = newAccountInput.value.trim();
+            if (newAccountName === '') {
+                alert('帳戶名稱不可為空。');
+                return;
+            }
+            if (accounts.includes(newAccountName)) {
+                alert(`帳戶 '${newAccountName}' 已存在。`);
+                return;
+            }
+            accounts.push(newAccountName);
+            saveAccounts();
+            populateAccountSelector(); // Refresh the dropdown
+            transactionAccountSelect.value = newAccountName; // Select the new account
+            newAccountInput.value = ''; // Clear input
+            alert(`帳戶 '${newAccountName}' 已新增。`);
         });
     }
 

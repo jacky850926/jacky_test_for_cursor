@@ -229,6 +229,15 @@ h2 {
     background-color: #b71c1c; /* Even darker red on hover */
 }
 
+/* Style for account display in transaction list */
+.transaction-list-section li .account-display {
+    font-size: 0.85rem;
+    color: #80cbc4; /* Tealish color */
+    margin-right: 10px;
+    font-style: italic;
+    white-space: nowrap; /* Prevent account name from wrapping if too long in the flex layout */
+}
+
 footer {
     text-align: center;
     padding: 25px;
@@ -459,6 +468,50 @@ footer {
 #add-new-category-btn.small-btn:hover {
     background: linear-gradient(90deg, #00acc1, #00796b);
     box-shadow: 0 2px 8px rgba(0, 188, 212, 0.3);
+}
+
+/* Styles for account adder in transaction form */
+#account-adder-container input[type="text"] {
+    /* Will inherit from #new-category-input if we keep the class, or define specifically */
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    background-color: rgba(10, 10, 30, 0.8);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+}
+
+#add-new-account-btn.small-btn {
+    /* Will inherit from #add-new-category-btn.small-btn if we keep the class, or define specifically */
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    background: linear-gradient(90deg, #00bcd4, #009688); 
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap; 
+}
+#add-new-account-btn.small-btn:hover {
+    background: linear-gradient(90deg, #00acc1, #00796b);
+    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.3);
+}
+
+#transaction-account {
+    width: calc(100% - 24px); /* Match other select styling */
+    padding: 12px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    background-color: rgba(10, 10, 30, 0.8);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 8px; /* Space before the adder for consistency */
 }
 
 /* Responsive adjustments */
