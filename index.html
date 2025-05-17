@@ -61,6 +61,21 @@
                 <!-- 交易紀錄將會顯示在這裡 -->
             </ul>
         </section>
+
+        <section class="exchange-rate-section">
+            <h2>即時匯率</h2>
+            <div class="currency-selector-container">
+                 <label for="base-currency-selector">選擇基準貨幣：</label>
+                 <select id="base-currency-selector">
+                     <!-- 貨幣選項將由 JavaScript 動態載入 -->
+                 </select>
+            </div>
+            <p class="rates-info">基準貨幣：<span id="display-base-currency">---</span> | 更新日期：<span id="rates-date">---</span></p>
+            <ul id="exchange-rate-list">
+                <!-- 匯率將會顯示在這裡 -->
+            </ul>
+        </section>
+
     </main>
     <footer>
         <p>&copy; 2024 記帳應用程式</p>
