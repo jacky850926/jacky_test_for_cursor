@@ -243,13 +243,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         transactionForm.reset();
         dateInput.valueAsDate = new Date(); // Reset date to today after submission
+        
         // Ensure transaction currency defaults back to primary currency after form reset
-        if (transactionCurrencySelect && primaryCurrency && Array.from(transactionCurrencySelect.options).find(opt => opt.value === primaryCurrency)) {
-            transactionCurrencySelect.value = primaryCurrency;
-        } else if (transactionCurrencySelect && transactionCurrencySelect.options.length > 0 && allCurrencyOptions['TWD']) {
-            transactionCurrencySelect.value = 'TWD'; // Fallback to TWD if primary not found or not set
-        } else if (transactionCurrencySelect && transactionCurrencySelect.options.length > 0) {
-             transactionCurrencySelect.value = transactionCurrencySelect.options[0].value; // Fallback to first if TWD not found
+        if (transactionCurrencySelect) { 
+            const options = Array.from(transactionCurrencySelect.options).map(opt => opt.value);
+            if (primaryCurrency && options.includes(primaryCurrency)) {
+                transactionCurrencySelect.value = primaryCurrency;
+            } else if (options.includes('TWD')) { // Fallback to TWD if primary not found or not set
+                transactionCurrencySelect.value = 'TWD'; 
+            } else if (options.length > 0) {
+                 transactionCurrencySelect.value = options[0]; // Fallback to first if TWD not found
+            }
         }
 
         // Populate accounts selector
@@ -289,24 +293,28 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`${FRANKFURTER_API_BASE}/currencies`);
             if (!response.ok) {
-                throw new Error(`無法獲取貨幣列表： ${response.statusText}`);
+                console.warn("無法從 API 獲取貨幣列表，將僅使用自訂類別和預設 TWD。");
+                // Even if API fails, proceed with custom categories and default TWD
             }
-            const currencies = await response.json();
-            
-            // Populate currency selectors (base, transaction, primary)
-            const allCurrencyOptions = {}; // To avoid duplicate options from API vs custom
+            const currenciesFromAPI = response.ok ? await response.json() : {};
 
-            // Add API currencies first
-            for (const currencyCode in currencies) {
-                allCurrencyOptions[currencyCode] = `${currencyCode} - ${currencies[currencyCode]}`;
-            }
-            // Add custom categories, potentially overwriting API if same code (custom takes precedence in display name if desired, but codes should be unique)
+            const allCurrencyOptions = {};
+
+            // 1. Add custom categories first
             customCategories.forEach(customCat => {
-                if (!allCurrencyOptions[customCat]) { // Only add if not already an official currency code
-                    allCurrencyOptions[customCat] = `${customCat} (自訂)`;
-                }
+                allCurrencyOptions[customCat] = `${customCat} (自訂)`;
             });
 
+            // 2. Then overlay/add API currencies. API names take precedence if code is same.
+            for (const currencyCode in currenciesFromAPI) {
+                allCurrencyOptions[currencyCode] = `${currencyCode} - ${currenciesFromAPI[currencyCode]}`;
+            }
+            
+            // 3. Ensure TWD is present.
+            if (!allCurrencyOptions['TWD']) {
+                allCurrencyOptions['TWD'] = 'TWD - 新台幣 (預設)'; 
+            }
+            
             // Clear existing options before populating
             baseCurrencySelector.innerHTML = '';
             transactionCurrencySelect.innerHTML = '';
