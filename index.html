@@ -41,54 +41,91 @@
             </div>
         </section>
 
-        <section class="transaction-form-section">
-            <h2>新增交易</h2>
-            <form id="transaction-form">
+        <section id="transactions-section" class="mb-8 p-6 bg-gray-800 rounded-lg shadow-xl">
+            <h2 class="text-2xl font-semibold text-teal-400 mb-4 border-b border-teal-500 pb-2">新增/編輯交易</h2>
+            <div id="transaction-type-selector" class="mb-6 flex space-x-2">
+                <button data-type="income" class="transaction-type-btn flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">收入</button>
+                <button data-type="expense" class="transaction-type-btn flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">支出</button>
+                <button data-type="transfer" class="transaction-type-btn flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-150 ease-in-out">轉帳</button>
+            </div>
+            <form id="transaction-form" class="space-y-6">
                 <div>
-                    <label for="type">類型：</label>
-                    <select id="type" name="type" required>
-                        <option value="income">收入</option>
-                        <option value="expense">支出</option>
+                    <label for="transaction-date" class="block text-sm font-medium text-gray-300 mb-1">日期</label>
+                    <input type="date" id="transaction-date" name="transaction-date" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                </div>
+
+                <div>
+                    <label for="transaction-account" class="block text-sm font-medium text-gray-300 mb-1">帳戶</label>
+                    <select id="transaction-account" name="transaction-account" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                        <!-- Account options will be populated by JS -->
+                        <option>載入中...</option>
                     </select>
                 </div>
-                <div>
-                    <label for="account">帳戶：</label>
-                    <select id="transaction-account" name="account" required>
-                        <!-- 帳戶選項將由 JavaScript 動態載入 -->
-                    </select>
-                    <div class="custom-category-adder" id="account-adder-container">
-                        <input type="text" id="new-account-input" placeholder="或輸入新帳戶名稱">
-                        <button type="button" id="add-new-account-btn" class="small-btn">新增帳戶</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="transaction-amount" class="block text-sm font-medium text-gray-300 mb-1">金額</label>
+                        <input type="number" id="transaction-amount" name="transaction-amount" placeholder="0.00" step="0.01" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                    </div>
+                    <div>
+                        <label for="transaction-currency" class="block text-sm font-medium text-gray-300 mb-1">幣種</label>
+                        <select id="transaction-currency" name="transaction-currency" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                            <!-- Currency options will be populated by JS, defaulting to primary display currency -->
+                            <option>載入中...</option>
+                        </select>
                     </div>
                 </div>
+
                 <div>
-                    <label for="description">描述：</label>
-                    <input type="text" id="description" name="description" placeholder="例如：午餐" required>
-                </div>
-                <div>
-                    <label for="amount">金額：</label>
-                    <input type="number" id="amount" name="amount" placeholder="例如：150" required min="0">
-                </div>
-                <div>
-                    <label for="currency">幣種：</label>
-                    <select id="transaction-currency" name="currency" required>
-                        <!-- 貨幣選項將由 JavaScript 動態載入 -->
+                    <label for="transaction-main-category" class="block text-sm font-medium text-gray-300 mb-1">主類別</label>
+                    <select id="transaction-main-category" name="transaction-main-category" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                        <!-- Main category options will be populated by JS -->
+                        <option>選擇主類別...</option>
                     </select>
-                    <div class="custom-category-adder">
-                        <input type="text" id="new-category-input" placeholder="或輸入新類別/幣種">
-                        <button type="button" id="add-new-category-btn" class="small-btn">新增類別</button>
+                    <!-- TODO: Add input for new main category if needed, or manage in categories-section -->
+                </div>
+
+                <div>
+                    <label for="transaction-sub-category" class="block text-sm font-medium text-gray-300 mb-1">子類別</label>
+                    <select id="transaction-sub-category" name="transaction-sub-category" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                        <!-- Sub-category options will be populated by JS based on main category -->
+                        <option>選擇子類別...</option>
+                    </select>
+                     <!-- TODO: Add input for new sub category if needed, or manage in categories-section -->
+                </div>
+
+                <div>
+                    <label for="transaction-description" class="block text-sm font-medium text-gray-300 mb-1">描述/備註</label>
+                    <textarea id="transaction-description" name="transaction-description" rows="3" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5" placeholder="選填，可輸入更詳細的交易說明..."></textarea>
+                </div>
+                
+                <!-- Fields for Transfer type will be dynamically shown/hidden by JS -->
+                <div id="transfer-fields" class="hidden space-y-6 border-t border-gray-700 pt-6 mt-6">
+                     <h3 class="text-lg font-medium text-gray-200">轉帳資訊</h3>
+                     <div>
+                        <label for="transfer-to-account" class="block text-sm font-medium text-gray-300 mb-1">轉入帳戶</label>
+                        <select id="transfer-to-account" name="transfer-to-account" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                            <option>選擇轉入帳戶...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="transfer-to-amount" class="block text-sm font-medium text-gray-300 mb-1">轉入金額 (若貨幣不同)</label>
+                        <input type="number" id="transfer-to-amount" name="transfer-to-amount" placeholder="可選，若貨幣轉換" step="0.01" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
+                    </div>
+                     <div>
+                        <label for="transfer-exchange-rate" class="block text-sm font-medium text-gray-300 mb-1">匯率 (1 <span id="transfer-from-currency-display"></span> = ? <span id="transfer-to-currency-display"></span>)</label>
+                        <input type="number" id="transfer-exchange-rate" name="transfer-exchange-rate" placeholder="自動/手動" step="0.000001" class="mt-1 block w-full bg-gray-700 border-gray-600 text-gray-200 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500 sm:text-sm p-2.5">
                     </div>
                 </div>
-                <div>
-                    <label for="date">日期：</label>
-                    <input type="date" id="date" name="date" required>
-                </div>
-                <button type="submit">新增</button>
+
+                <button type="submit" id="save-transaction-btn" class="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-150 ease-in-out text-base">
+                    儲存交易
+                </button>
             </form>
         </section>
 
-        <section class="transaction-list-section">
-            <h2>交易紀錄</h2>
+        <section id="transaction-list-section" class="mb-8 p-6 bg-gray-800 rounded-lg shadow-xl">
+            <h2 class="text-2xl font-semibold text-teal-400 mb-4 border-b border-teal-500 pb-2">交易紀錄</h2>
             <ul id="transaction-list">
                 <!-- 交易紀錄將會顯示在這裡 -->
             </ul>

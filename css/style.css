@@ -1,0 +1,44 @@
+/* css/style.css - Main stylesheet for the application */
+
+/* Basic Reset (Optional, as Tailwind CSS includes a preflight) */
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
+  margin: 0;
+  padding: 0;
+}
+
+/* Apply a more consistent box-sizing model.
+   Tailwind's preflight handles this as well.
+*/
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Global Styles (some might be handled by Tailwind utility classes directly in HTML) */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  line-height: 1.6;
+  /* Tailwind classes like bg-gray-900 text-gray-100 handle base colors */
+}
+
+/* Custom component styles or overrides if needed beyond Tailwind */
+
+/* Example: Styling for a custom button if not fully achievable with Tailwind alone */
+.btn-custom-primary {
+  @apply bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded shadow;
+  /* Tailwind's @apply directive can be used here if your CSS is processed by PostCSS with Tailwind plugin */
+  /* If not using @apply, define standard CSS: */
+  /* background-color: #14b8a6; ... */
+}
+
+/* Specific styles for sections if needed */
+/* #dashboard-section { ... } */
+
+/* Utility classes (if any) */
+.hidden {
+  display: none !important; /* Important to override Tailwind's responsive display classes if needed globally */
+}
+
+/* Ensure smooth scrolling for anchor links */
+html {
+  scroll-behavior: smooth;
+} 
