@@ -13,19 +13,31 @@
     <main>
         <section class="summary-section">
             <h2>總覽</h2>
-            <div class="summary-cards">
+            
+            <div class="primary-currency-selector-container">
+                <label for="primary-currency-selector">設定主要顯示貨幣：</label>
+                <select id="primary-currency-selector">
+                    <!-- 主要貨幣選項將由 JavaScript 動態載入 -->
+                </select>
+            </div>
+
+            <div class="summary-cards" id="overall-summary-cards">
                 <div class="card">
-                    <h3>總收入</h3>
-                    <p id="total-income">NT$0</p>
+                    <h3>總收入 (<span class="primary-currency-display">---</span>)</h3>
+                    <p id="overall-total-income">0</p>
                 </div>
                 <div class="card">
-                    <h3>總支出</h3>
-                    <p id="total-expense">NT$0</p>
+                    <h3>總支出 (<span class="primary-currency-display">---</span>)</h3>
+                    <p id="overall-total-expense">0</p>
                 </div>
                 <div class="card">
-                    <h3>餘額</h3>
-                    <p id="balance">NT$0</p>
+                    <h3>餘額 (<span class="primary-currency-display">---</span>)</h3>
+                    <p id="overall-balance">0</p>
                 </div>
+            </div>
+
+            <div id="per-currency-summary-container">
+                <!-- 各幣種詳細總覽將動態生成於此 -->
             </div>
         </section>
 
@@ -46,6 +58,16 @@
                 <div>
                     <label for="amount">金額：</label>
                     <input type="number" id="amount" name="amount" placeholder="例如：150" required min="0">
+                </div>
+                <div>
+                    <label for="currency">幣種：</label>
+                    <select id="transaction-currency" name="currency" required>
+                        <!-- 貨幣選項將由 JavaScript 動態載入 -->
+                    </select>
+                    <div class="custom-category-adder">
+                        <input type="text" id="new-category-input" placeholder="或輸入新類別/幣種">
+                        <button type="button" id="add-new-category-btn" class="small-btn">新增類別</button>
+                    </div>
                 </div>
                 <div>
                     <label for="date">日期：</label>

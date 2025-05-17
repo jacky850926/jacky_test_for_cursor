@@ -239,6 +239,228 @@ footer {
     border-top: 1px solid rgba(0, 229, 255, 0.1);
 }
 
+/* --- Exchange Rate Section Styles --- */
+.exchange-rate-section {
+    /* Styles for the section container are already covered by generic 'section' styles */
+}
+
+.currency-selector-container {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.exchange-rate-section label {
+    font-weight: 600;
+    color: #bbdefb; /* Light blue, consistent with other labels */
+    font-size: 0.95rem;
+}
+
+.exchange-rate-section select#base-currency-selector {
+    width: auto; /* Adjust width as needed, or set a specific min-width */
+    min-width: 150px;
+    padding: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    background-color: rgba(10, 10, 30, 0.8); /* Dark input background */
+    color: #e0e0e0; /* Light text in input */
+    font-family: 'Poppins', sans-serif;
+}
+
+.rates-info {
+    font-size: 0.85rem;
+    color: #90a4ae; /* Lighter grey for info text */
+    margin-bottom: 15px;
+}
+
+.rates-info span {
+    font-weight: 600;
+    color: #c5cae9;
+}
+
+#exchange-rate-list {
+    list-style-type: none;
+    padding: 0;
+    max-height: 300px; /* Limit height and allow scrolling if many currencies */
+    overflow-y: auto;
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 6px;
+    padding: 10px;
+}
+
+#exchange-rate-list li {
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: rgba(25, 25, 45, 0.7); /* Slightly different item background */
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.05);
+}
+
+#exchange-rate-list li:last-child {
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+#exchange-rate-list .currency-code {
+    font-weight: 700;
+    color: #00e5ff;
+    flex-basis: 20%;
+}
+
+#exchange-rate-list .currency-rate {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: #e0e0e0;
+    flex-basis: 30%;
+    text-align: right;
+}
+
+#exchange-rate-list .base-comparison {
+    font-size: 0.8rem;
+    color: #78909c;
+    flex-basis: 50%;
+    text-align: right;
+}
+
+/* Custom scrollbar for exchange rate list (WebKit browsers) */
+#exchange-rate-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+#exchange-rate-list::-webkit-scrollbar-track {
+    background: rgba(10, 10, 30, 0.5);
+    border-radius: 4px;
+}
+
+#exchange-rate-list::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 229, 255, 0.3);
+    border-radius: 4px;
+    border: 2px solid transparent; /* Creates padding around thumb */
+    background-clip: content-box;
+}
+
+#exchange-rate-list::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 229, 255, 0.5);
+}
+
+/* --- Primary Currency Selector and Per-Currency Summary Styles --- */
+.primary-currency-selector-container {
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px;
+    background-color: rgba(30, 30, 50, 0.7); /* Consistent with section styling */
+    border-radius: 8px;
+    border: 1px solid rgba(0, 229, 255, 0.1);
+}
+
+.primary-currency-selector-container label {
+    font-weight: 600;
+    color: #bbdefb;
+    font-size: 0.95rem;
+}
+
+#primary-currency-selector {
+    width: auto;
+    min-width: 150px;
+    padding: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.95rem;
+    background-color: rgba(10, 10, 30, 0.8);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+}
+
+#overall-summary-cards .card h3 .primary-currency-display {
+    color: #00e5ff; /* Accent color for the currency code in overall summary */
+    font-weight: bold;
+}
+
+#per-currency-summary-container {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Responsive grid for per-currency cards */
+    gap: 20px;
+}
+
+.per-currency-card {
+    background-color: rgba(40, 40, 70, 0.8); /* Slightly different from main cards */
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.per-currency-card h4 {
+    color: #00e5ff; /* Accent color for currency title */
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+    padding-bottom: 8px;
+}
+
+.per-currency-card p {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    color: #e0e0e0;
+    margin-bottom: 8px;
+    display: flex; 
+    justify-content: space-between;
+}
+
+.per-currency-card p:last-child {
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+/* Styles for custom category adder in transaction form */
+.custom-category-adder {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px; /* Add some space above it */
+    align-items: center;
+}
+
+#new-category-input {
+    flex-grow: 1; /* Allow input to take available space */
+    padding: 10px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    background-color: rgba(10, 10, 30, 0.8);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+}
+
+#add-new-category-btn.small-btn {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    background: linear-gradient(90deg, #00bcd4, #009688); /* Different gradient for utility button */
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+#add-new-category-btn.small-btn:hover {
+    background: linear-gradient(90deg, #00acc1, #00796b);
+    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.3);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .summary-section .summary-cards {

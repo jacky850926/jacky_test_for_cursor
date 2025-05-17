@@ -5,14 +5,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalExpenseEl = document.getElementById('total-expense');
     const balanceEl = document.getElementById('balance');
     const dateInput = document.getElementById('date');
+    const transactionCurrencySelect = document.getElementById('transaction-currency');
+
+    // New elements for exchange rates
+    const baseCurrencySelector = document.getElementById('base-currency-selector');
+    const exchangeRateListEl = document.getElementById('exchange-rate-list');
+    const displayBaseCurrencyEl = document.getElementById('display-base-currency');
+    const ratesDateEl = document.getElementById('rates-date');
+    const FRANKFURTER_API_BASE = 'https://api.frankfurter.app';
+
+    // Overall Summary Elements (Primary Currency)
+    const overallTotalIncomeEl = document.getElementById('overall-total-income');
+    const overallTotalExpenseEl = document.getElementById('overall-total-expense');
+    const overallBalanceEl = document.getElementById('overall-balance');
+    const primaryCurrencyDisplaySpans = document.querySelectorAll('.primary-currency-display');
+    const primaryCurrencySelector = document.getElementById('primary-currency-selector');
+
+    // Per-Currency Summary Container
+    const perCurrencySummaryContainer = document.getElementById('per-currency-summary-container');
+
+    const newCategoryInput = document.getElementById('new-category-input');
+    const addNewCategoryBtn = document.getElementById('add-new-category-btn');
 
     // Set default date to today
     dateInput.valueAsDate = new Date();
 
     let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+    let primaryCurrency = localStorage.getItem('primaryCurrency') || 'TWD'; // Load primary currency, default TWD
+    let latestRates = {}; // To cache fetched rates for conversions
+    let customCategories = JSON.parse(localStorage.getItem('customCategories')) || [];
 
     function saveTransactions() {
         localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+
+    function savePrimaryCurrency() {
+        localStorage.setItem('primaryCurrency', primaryCurrency);
+    }
+
+    function saveCustomCategories() {
+        localStorage.setItem('customCategories', JSON.stringify(customCategories));
     }
 
     function addTransactionDOM(transaction) {
@@ -24,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         item.innerHTML = `
             <span class="description">${transaction.description}</span>
-            <span class="amount ${amountClass}">NT$${transaction.type === 'income' ? '' : '-'}${Math.abs(transaction.amount).toLocaleString()}</span>
+            <span class="amount ${amountClass}">${transaction.currency} ${transaction.type === 'income' ? '' : '-'}${Math.abs(transaction.amount).toLocaleString()}</span>
             <span class="date">${transaction.date}</span>
             <button class="delete-btn" data-id="${transaction.id}">刪除</button>
         `;
@@ -32,21 +64,121 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateSummary() {
-        const amounts = transactions.map(transaction => transaction.amount);
+        // Clear previous per-currency summaries
+        if(perCurrencySummaryContainer) perCurrencySummaryContainer.innerHTML = '';
 
-        const income = amounts
-            .filter(item => item > 0)
-            .reduce((acc, item) => (acc += item), 0);
+        const amountsByCurrency = {};
 
-        const expense = amounts
-            .filter(item => item < 0)
-            .reduce((acc, item) => (acc += item), 0) * -1; // Make it positive for display
+        transactions.forEach(transaction => {
+            if (!amountsByCurrency[transaction.currency]) {
+                amountsByCurrency[transaction.currency] = { income: 0, expense: 0, transactions: [] };
+            }
+            if (transaction.amount > 0) {
+                amountsByCurrency[transaction.currency].income += transaction.amount;
+            } else {
+                amountsByCurrency[transaction.currency].expense += Math.abs(transaction.amount);
+            }
+            amountsByCurrency[transaction.currency].transactions.push(transaction);
+        });
 
-        const balance = income - expense;
+        // Display per-currency summaries
+        for (const currency in amountsByCurrency) {
+            const summary = amountsByCurrency[currency];
+            const balance = summary.income - summary.expense;
+            
+            const currencyCard = document.createElement('div');
+            currencyCard.classList.add('card', 'per-currency-card');
+            currencyCard.innerHTML = `
+                <h4>${currency} 明細</h4>
+                <p>收入: ${summary.income.toLocaleString()}</p>
+                <p>支出: ${summary.expense.toLocaleString()}</p>
+                <p>餘額: ${balance.toLocaleString()}</p>
+            `;
+            if(perCurrencySummaryContainer) perCurrencySummaryContainer.appendChild(currencyCard);
+        }
+        
+        // Update overall summary in primary currency
+        updateOverallSummary(); 
+    }
 
-        totalIncomeEl.textContent = `NT$${income.toLocaleString()}`;
-        totalExpenseEl.textContent = `NT$${expense.toLocaleString()}`;
-        balanceEl.textContent = `NT$${balance.toLocaleString()}`;
+    async function updateOverallSummary() {
+        if (!overallTotalIncomeEl || !overallTotalExpenseEl || !overallBalanceEl) return;
+
+        let overallIncome = 0;
+        let overallExpense = 0;
+
+        // Update display for primary currency in titles
+        primaryCurrencyDisplaySpans.forEach(span => span.textContent = primaryCurrency);
+
+        // Fetch rates for conversion if transactions exist
+        if (transactions.length > 0) {
+            try {
+                // We need rates from each transaction.currency TO primaryCurrency
+                // For simplicity, fetch all rates relative to USD (or any major currency) first as an intermediate step if direct rate is not simple.
+                // Or, better, fetch for each transaction_currency against the primary_currency.
+                // Frankfurter allows `latest?from=SOURCE&to=TARGET1,TARGET2` but only if SOURCE is EUR or USD for free tier for `to` param.
+                // So, we will fetch `latest?from=transaction_currency` and look for `primaryCurrency` rate.
+                // If `transaction_currency` is `primaryCurrency`, rate is 1.
+
+                // Collect all unique transaction currencies that are not the primary currency
+                const currenciesToFetchRatesFor = [...new Set(transactions.map(t => t.currency))]
+                                                .filter(c => c !== primaryCurrency);
+                
+                // Fetch rates for these currencies against the primary currency if not already cached or if primary currency itself
+                // This logic needs to be robust. For now, let's assume we fetch `latest?from=[PrimaryCurrency]`
+                // And then convert. This is simpler for now.
+
+                const ratesResponse = await fetch(`${FRANKFURTER_API_BASE}/latest?from=${primaryCurrency}`);
+                if (!ratesResponse.ok) throw new Error('Could not fetch rates for overall summary');
+                const fetchedRates = await ratesResponse.json();
+                latestRates = fetchedRates.rates; // Cache these rates
+                latestRates[primaryCurrency] = 1; // Rate of primary to itself is 1
+
+                for (const transaction of transactions) {
+                    let amountInPrimaryCurrency = transaction.amount;
+                    if (transaction.currency !== primaryCurrency) {
+                        const rate = latestRates[transaction.currency];
+                        if (rate) {
+                            // This conversion is: transaction.amount (in transaction.currency) / rate (rate is primaryCurrency per transaction.currency)
+                            // Example: primary=TWD. transaction=10 USD. rate[USD] = 30 (TWD per USD)
+                            // amountInPrimaryCurrency = 10 USD * 30 TWD/USD = 300 TWD.
+                            // The API `latest?from=TWD` gives { "USD": 0.033 } (USD per TWD).
+                            // So if primary is TWD, and transaction is USD, transaction.amount / rate[USD] is correct.
+                            // transaction.amount (USD) / (USD per TWD) = TWD. This is what we need for the API structure `latest?from=PRIMARY`
+                            amountInPrimaryCurrency = transaction.amount / latestRates[transaction.currency];
+                        } else if (customCategories.includes(transaction.currency)){
+                            // This is a custom category and not the primary currency, and no rate was found (as expected).
+                            // We cannot convert this to the primary currency if the primary is an official one.
+                            console.warn(`自訂類別 ${transaction.currency} 無法轉換至主要貨幣 ${primaryCurrency}。該筆交易將不計入總覽。`);
+                            amountInPrimaryCurrency = null; // Indicate it shouldn't be summed for overall if conversion failed.
+                        } else {
+                             console.warn(`找不到從 ${transaction.currency} 到 ${primaryCurrency} 的匯率。該筆交易將不計入總覽。`);
+                             amountInPrimaryCurrency = null;
+                        }
+                    }
+
+                    if (amountInPrimaryCurrency !== null && typeof amountInPrimaryCurrency === 'number') {
+                        if (amountInPrimaryCurrency > 0) {
+                            overallIncome += amountInPrimaryCurrency;
+                        } else {
+                            overallExpense += Math.abs(amountInPrimaryCurrency);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching rates for overall summary:", error);
+                // Display a message or use unconverted sums as a fallback?
+                overallTotalIncomeEl.textContent = 'Error';
+                overallTotalExpenseEl.textContent = 'Error';
+                overallBalanceEl.textContent = 'Error';
+                return;
+            }
+        }
+
+        overallTotalIncomeEl.textContent = `${primaryCurrency} ${overallIncome.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        overallTotalExpenseEl.textContent = `${primaryCurrency} ${overallExpense.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        const overallBal = overallIncome - overallExpense;
+        overallBalanceEl.textContent = `${primaryCurrency} ${overallBal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 
     function addTransaction(e) {
@@ -56,9 +188,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const description = document.getElementById('description').value;
         const amount = parseFloat(document.getElementById('amount').value);
         const date = document.getElementById('date').value;
+        const currency = transactionCurrencySelect.value;
 
-        if (description.trim() === '' || isNaN(amount) || date === '') {
-            alert('請填寫所有欄位');
+        if (description.trim() === '' || isNaN(amount) || date === '' || currency === '') {
+            alert('請填寫所有欄位，包括幣種');
             return;
         }
 
@@ -67,6 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
             type: type,
             description: description,
             amount: type === 'income' ? amount : -amount, // Store expense as negative
+            currency: currency,
             date: date
         };
 
@@ -105,4 +239,204 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     init();
+
+    // --- Exchange Rate Functionality ---
+
+    async function fetchCurrenciesAndPopulateSelector() {
+        try {
+            const response = await fetch(`${FRANKFURTER_API_BASE}/currencies`);
+            if (!response.ok) {
+                throw new Error(`無法獲取貨幣列表： ${response.statusText}`);
+            }
+            const currencies = await response.json();
+            
+            // Populate currency selectors (base, transaction, primary)
+            const allCurrencyOptions = {}; // To avoid duplicate options from API vs custom
+
+            // Add API currencies first
+            for (const currencyCode in currencies) {
+                allCurrencyOptions[currencyCode] = `${currencyCode} - ${currencies[currencyCode]}`;
+            }
+            // Add custom categories, potentially overwriting API if same code (custom takes precedence in display name if desired, but codes should be unique)
+            customCategories.forEach(customCat => {
+                if (!allCurrencyOptions[customCat]) { // Only add if not already an official currency code
+                    allCurrencyOptions[customCat] = `${customCat} (自訂)`;
+                }
+            });
+
+            // Clear existing options before populating
+            baseCurrencySelector.innerHTML = '';
+            transactionCurrencySelect.innerHTML = '';
+            primaryCurrencySelector.innerHTML = '';
+
+            for (const code in allCurrencyOptions) {
+                const optionText = allCurrencyOptions[code];
+                const option = document.createElement('option');
+                option.value = code;
+                option.textContent = optionText;
+
+                baseCurrencySelector.appendChild(option.cloneNode(true));
+                transactionCurrencySelect.appendChild(option.cloneNode(true));
+                primaryCurrencySelector.appendChild(option.cloneNode(true));
+            }
+
+            // Set default selected values
+            if (allCurrencyOptions['TWD']) {
+                baseCurrencySelector.value = 'TWD';
+                transactionCurrencySelect.value = 'TWD';
+            } else if (Object.keys(allCurrencyOptions).length > 0) {
+                const firstKey = Object.keys(allCurrencyOptions)[0];
+                baseCurrencySelector.value = firstKey;
+                transactionCurrencySelect.value = firstKey;
+            }
+
+            // Set primary currency, ensuring it exists in the populated list
+            if (allCurrencyOptions[primaryCurrency]) {
+                primaryCurrencySelector.value = primaryCurrency;
+            } else if (Object.keys(allCurrencyOptions).length > 0) {
+                primaryCurrency = Object.keys(allCurrencyOptions)[0];
+                primaryCurrencySelector.value = primaryCurrency;
+                savePrimaryCurrency();
+            } else {
+                // No currencies at all, handle gracefully (e.g. disable selector or show message)
+                // This case should be rare if API call succeeds or custom categories exist.
+            }
+
+            // Fetch initial rates for the default selected currency
+            if (baseCurrencySelector.value) {
+                fetchAndDisplayRates(baseCurrencySelector.value);
+            }
+
+        } catch (error) {
+            console.error("獲取貨幣時發生錯誤:", error);
+            exchangeRateListEl.innerHTML = '<li>無法載入貨幣數據。</li>';
+        }
+    }
+
+    async function fetchAndDisplayRates(baseCurrency) {
+        if (!baseCurrency) {
+            exchangeRateListEl.innerHTML = '<li>請選擇基準貨幣。</li>';
+            displayBaseCurrencyEl.textContent = '---';
+            ratesDateEl.textContent = '---';
+            return;
+        }
+        // Check if the baseCurrency is a custom category without official rates
+        if (customCategories.includes(baseCurrency) && !(await isOfficialCurrency(baseCurrency))) {
+            exchangeRateListEl.innerHTML = `<li>${baseCurrency} 是自訂類別，無可用匯率數據。</li>`;
+            displayBaseCurrencyEl.textContent = baseCurrency;
+            ratesDateEl.textContent = 'N/A';
+            return;
+        }
+        exchangeRateListEl.innerHTML = '<li>載入中...</li>'; // Loading indicator
+        try {
+            const response = await fetch(`${FRANKFURTER_API_BASE}/latest?from=${baseCurrency}`);
+            if (!response.ok) {
+                throw new Error(`無法獲取匯率： ${response.statusText}`);
+            }
+            const data = await response.json();
+            
+            displayBaseCurrencyEl.textContent = data.base;
+            ratesDateEl.textContent = data.date;
+            
+            displayRates(data.rates, data.base);
+
+        } catch (error) {
+            console.error(`獲取 ${baseCurrency} 匯率時發生錯誤:`, error);
+            exchangeRateListEl.innerHTML = `<li>無法載入 ${baseCurrency} 的匯率數據。</li>`;
+            displayBaseCurrencyEl.textContent = baseCurrency;
+            ratesDateEl.textContent = '錯誤';
+        }
+    }
+
+    function displayRates(rates, base) {
+        exchangeRateListEl.innerHTML = ''; // Clear previous rates or loading message
+        if (Object.keys(rates).length === 0) {
+            exchangeRateListEl.innerHTML = `<li>沒有可用的 ${base} 匯率數據。</li>`;
+            return;
+        }
+        for (const currency in rates) {
+            const rate = rates[currency];
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `
+                <span class="currency-code">${currency}</span>
+                <span class="currency-rate">${rate.toFixed(4)}</span>
+                <span class="base-comparison">(1 ${base} = ${rate.toFixed(4)} ${currency})</span>
+            `;
+            exchangeRateListEl.appendChild(listItem);
+        }
+    }
+
+    // Event listener for currency selector
+    if (baseCurrencySelector) {
+        baseCurrencySelector.addEventListener('change', (e) => {
+            fetchAndDisplayRates(e.target.value);
+        });
+    }
+    // Event listener for primary currency selector
+    if (primaryCurrencySelector) {
+        primaryCurrencySelector.addEventListener('change', (e) => {
+            primaryCurrency = e.target.value;
+            savePrimaryCurrency();
+            updateSummary(); // Re-calculate and display all summaries
+        });
+    }
+    
+    // Initialize exchange rate functionality
+    if (baseCurrencySelector && exchangeRateListEl && displayBaseCurrencyEl && ratesDateEl) {
+        fetchCurrenciesAndPopulateSelector();
+    }
+
+    // Event listener for adding a new custom category
+    if (addNewCategoryBtn && newCategoryInput) {
+        addNewCategoryBtn.addEventListener('click', () => {
+            const newCategoryName = newCategoryInput.value.trim().toUpperCase();
+            if (newCategoryName === '') {
+                alert('類別名稱不可為空。');
+                return;
+            }
+
+            // Check if category already exists (either as official or custom)
+            let exists = false;
+            for (let i = 0; i < transactionCurrencySelect.options.length; i++) {
+                if (transactionCurrencySelect.options[i].value === newCategoryName) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (exists) {
+                alert(`類別 '${newCategoryName}' 已存在。`);
+                return;
+            }
+
+            customCategories.push(newCategoryName);
+            saveCustomCategories();
+
+            // Add to all relevant select elements
+            const optionText = `${newCategoryName} (自訂)`;
+            const newOption = document.createElement('option');
+            newOption.value = newCategoryName;
+            newOption.textContent = optionText;
+
+            transactionCurrencySelect.appendChild(newOption.cloneNode(true));
+            primaryCurrencySelector.appendChild(newOption.cloneNode(true));
+            baseCurrencySelector.appendChild(newOption.cloneNode(true));
+            
+            // Optionally, select the newly added category in the transaction form
+            transactionCurrencySelect.value = newCategoryName;
+            newCategoryInput.value = ''; // Clear input
+            alert(`自訂類別 '${newCategoryName}' 已新增。`);
+        });
+    }
+
+    // Helper function to check if a currency code is official (part of API response)
+    async function isOfficialCurrency(currencyCode) {
+        try {
+            const response = await fetch(`${FRANKFURTER_API_BASE}/currencies`);
+            const officialCurrencies = await response.json();
+            return officialCurrencies.hasOwnProperty(currencyCode);
+        } catch (error) {
+            console.error("Error checking official currencies:", error);
+            return false; // Assume not official on error
+        }
+    }
 }); 
