@@ -1,0 +1,226 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #5cb85c;
+    color: #fff;
+    padding: 1.5rem 0;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+main {
+    padding: 20px;
+    max-width: 900px;
+    margin: 20px auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+section {
+    margin-bottom: 30px;
+}
+
+h2 {
+    color: #3a3a3a;
+    border-bottom: 2px solid #5cb85c;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.summary-section .summary-cards {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+    text-align: center;
+}
+
+.summary-section .card {
+    background-color: #e9f5e9;
+    padding: 20px;
+    border-radius: 8px;
+    flex-basis: 30%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.summary-section .card h3 {
+    margin-top: 0;
+    color: #555;
+    font-size: 1.1rem;
+}
+
+.summary-section .card p {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #5cb85c;
+    margin-bottom: 0;
+}
+
+#total-expense {
+    color: #d9534f;
+}
+
+#balance {
+    color: #4a90e2;
+}
+
+.transaction-form-section form div {
+    margin-bottom: 15px;
+}
+
+.transaction-form-section label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.transaction-form-section input[type="text"],
+.transaction-form-section input[type="number"],
+.transaction-form-section input[type="date"],
+.transaction-form-section select {
+    width: calc(100% - 22px); /* Account for padding and border */
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+.transaction-form-section button[type="submit"] {
+    background-color: #5cb85c;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+.transaction-form-section button[type="submit"]:hover {
+    background-color: #4cae4c;
+}
+
+.transaction-list-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.transaction-list-section li {
+    background-color: #f9f9f9;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border-left: 5px solid #5cb85c; /* Default to income */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.transaction-list-section li.expense {
+    border-left-color: #d9534f;
+}
+
+.transaction-list-section li span {
+    font-size: 0.9rem;
+}
+
+.transaction-list-section li .description {
+    font-weight: bold;
+    flex-grow: 1;
+    margin-right: 10px;
+}
+
+.transaction-list-section li .amount {
+    font-weight: bold;
+    min-width: 80px; /* Ensure amounts align nicely */
+    text-align: right;
+}
+
+.transaction-list-section li .date {
+    color: #777;
+    font-size: 0.85rem;
+    margin-left: 15px;
+}
+
+.transaction-list-section li button.delete-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 15px;
+    font-size: 0.8rem;
+}
+
+.transaction-list-section li button.delete-btn:hover {
+    background-color: #c9302c;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    margin-top: 30px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .summary-section .summary-cards {
+        flex-direction: column;
+    }
+    .summary-section .card {
+        flex-basis: auto; /* Allow cards to take full width */
+        margin-bottom: 15px;
+    }
+    main {
+        margin: 10px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    h2 {
+        font-size: 1.3rem;
+    }
+    .transaction-form-section input[type="text"],
+    .transaction-form-section input[type="number"],
+    .transaction-form-section input[type="date"],
+    .transaction-form-section select,
+    .transaction-form-section button[type="submit"] {
+        font-size: 0.9rem;
+    }
+    .transaction-list-section li {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .transaction-list-section li .date {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    .transaction-list-section li button.delete-btn {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+} 
