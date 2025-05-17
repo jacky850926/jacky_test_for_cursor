@@ -18,9 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function addTransactionDOM(transaction) {
         const item = document.createElement('li');
         item.classList.add(transaction.type);
+
+        // Determine amount class based on transaction type for specific styling
+        const amountClass = transaction.type === 'income' ? 'income-amount' : 'expense-amount';
+
         item.innerHTML = `
             <span class="description">${transaction.description}</span>
-            <span class="amount">NT$${transaction.type === 'income' ? '' : '-'}${Math.abs(transaction.amount).toLocaleString()}</span>
+            <span class="amount ${amountClass}">NT$${transaction.type === 'income' ? '' : '-'}${Math.abs(transaction.amount).toLocaleString()}</span>
             <span class="date">${transaction.date}</span>
             <button class="delete-btn" data-id="${transaction.id}">刪除</button>
         `;

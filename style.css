@@ -1,118 +1,158 @@
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
     line-height: 1.6;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto+Mono:wght@400;700&display=swap');
+
 header {
-    background-color: #5cb85c;
-    color: #fff;
+    background: linear-gradient(90deg, #1a237e, #00e5ff); /* Tech gradient */
+    color: #ffffff;
     padding: 1.5rem 0;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 229, 255, 0.2); /* Subtle glow */
 }
 
 header h1 {
     margin: 0;
-    font-size: 2rem;
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
 }
 
 main {
-    padding: 20px;
-    max-width: 900px;
-    margin: 20px auto;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    max-width: 950px;
+    margin: 30px auto;
+    background-color: rgba(26, 26, 46, 0.8); /* Dark, slightly transparent card */
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 150, 255, 0.15);
+    border: 1px solid rgba(0, 229, 255, 0.2); /* Subtle border */
 }
 
 section {
-    margin-bottom: 30px;
+    margin-bottom: 35px;
+    padding: 20px;
+    background-color: rgba(30, 30, 50, 0.7); /* Slightly different dark shade for sections */
+    border-radius: 8px;
+    border: 1px solid rgba(0, 229, 255, 0.1);
 }
 
 h2 {
-    color: #3a3a3a;
-    border-bottom: 2px solid #5cb85c;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    color: #00e5ff; /* Bright accent color */
+    border-bottom: 2px solid #00e5ff;
+    padding-bottom: 12px;
+    margin-bottom: 25px;
+    font-size: 1.7rem;
+    font-weight: 600;
 }
 
 .summary-section .summary-cards {
     display: flex;
-    justify-content: space-around;
-    gap: 20px;
+    justify-content: space-between;
+    gap: 25px;
     text-align: center;
 }
 
 .summary-section .card {
-    background-color: #e9f5e9;
-    padding: 20px;
-    border-radius: 8px;
-    flex-basis: 30%;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: rgba(40, 40, 70, 0.9); /* Darker card */
+    padding: 25px;
+    border-radius: 10px;
+    flex-basis: 31%;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.summary-section .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 229, 255, 0.2);
 }
 
 .summary-section .card h3 {
     margin-top: 0;
-    color: #555;
-    font-size: 1.1rem;
+    color: #bbdefb; /* Light blue for subheadings */
+    font-size: 1.2rem;
+    font-weight: 400;
 }
 
 .summary-section .card p {
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: #5cb85c;
+    font-family: 'Roboto Mono', monospace; /* Monospaced font for numbers */
+    font-size: 1.8rem;
+    font-weight: 700;
     margin-bottom: 0;
 }
 
+#total-income {
+    color: #00e5ff; /* Cyan for income */
+}
+
 #total-expense {
-    color: #d9534f;
+    color: #ff4081; /* Pink/Red for expense */
 }
 
 #balance {
-    color: #4a90e2;
+    color: #76ff03; /* Bright green for balance */
 }
 
 .transaction-form-section form div {
-    margin-bottom: 15px;
+    margin-bottom: 18px;
 }
 
 .transaction-form-section label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #555;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #bbdefb; /* Light blue */
+    font-size: 0.95rem;
 }
 
 .transaction-form-section input[type="text"],
 .transaction-form-section input[type="number"],
 .transaction-form-section input[type="date"],
 .transaction-form-section select {
-    width: calc(100% - 22px); /* Account for padding and border */
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    width: calc(100% - 24px);
+    padding: 12px;
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 6px;
     box-sizing: border-box;
     font-size: 1rem;
+    background-color: rgba(10, 10, 30, 0.8); /* Dark input background */
+    color: #e0e0e0; /* Light text in input */
+    font-family: 'Poppins', sans-serif;
+}
+
+.transaction-form-section input[type="text"]::placeholder,
+.transaction-form-section input[type="number"]::placeholder {
+    color: #78909c; /* Muted placeholder text */
+}
+
+.transaction-form-section input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) brightness(0.8) sepia(0.5) saturate(5) hue-rotate(180deg); /* Style date picker icon for dark theme */
 }
 
 .transaction-form-section button[type="submit"] {
-    background-color: #5cb85c;
+    background: linear-gradient(90deg, #007bff, #00e5ff); /* Tech gradient button */
     color: white;
-    padding: 12px 20px;
+    padding: 12px 25px;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 1rem;
-    transition: background-color 0.3s ease;
+    font-size: 1.05rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 229, 255, 0.2);
 }
 
 .transaction-form-section button[type="submit"]:hover {
-    background-color: #4cae4c;
+    background: linear-gradient(90deg, #0056b3, #00b8d4);
+    box-shadow: 0 4px 12px rgba(0, 229, 255, 0.3);
+    transform: translateY(-2px);
 }
 
 .transaction-list-section ul {
@@ -121,64 +161,82 @@ h2 {
 }
 
 .transaction-list-section li {
-    background-color: #f9f9f9;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border-left: 5px solid #5cb85c; /* Default to income */
+    background-color: rgba(35, 35, 60, 0.85);
+    padding: 15px 20px;
+    margin-bottom: 12px;
+    border-radius: 8px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border-left: 5px solid #00e5ff; /* Default to income accent */
+    transition: background-color 0.3s ease;
+}
+
+.transaction-list-section li:hover {
+    background-color: rgba(45, 45, 75, 0.9);
 }
 
 .transaction-list-section li.expense {
-    border-left-color: #d9534f;
+    border-left-color: #ff4081; /* Expense accent */
 }
 
 .transaction-list-section li span {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
 }
 
 .transaction-list-section li .description {
-    font-weight: bold;
+    font-weight: 600;
     flex-grow: 1;
-    margin-right: 10px;
+    margin-right: 15px;
+    color: #ffffff;
 }
 
 .transaction-list-section li .amount {
-    font-weight: bold;
-    min-width: 80px; /* Ensure amounts align nicely */
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    min-width: 100px;
     text-align: right;
+    color: #ffffff;
+}
+
+.transaction-list-section li .amount.income-amount {
+    color: #00e5ff;
+}
+.transaction-list-section li .amount.expense-amount {
+    color: #ff4081;
 }
 
 .transaction-list-section li .date {
-    color: #777;
-    font-size: 0.85rem;
-    margin-left: 15px;
+    color: #90a4ae; /* Lighter grey for date */
+    font-size: 0.8rem;
+    margin-left: 20px;
 }
 
 .transaction-list-section li button.delete-btn {
-    background-color: #d9534f;
+    background-color: #c62828; /* Darker red for delete */
     color: white;
     border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
+    padding: 6px 12px;
+    border-radius: 5px;
     cursor: pointer;
-    margin-left: 15px;
-    font-size: 0.8rem;
+    margin-left: 20px;
+    font-size: 0.85rem;
+    transition: background-color 0.3s ease;
 }
 
 .transaction-list-section li button.delete-btn:hover {
-    background-color: #c9302c;
+    background-color: #b71c1c; /* Even darker red on hover */
 }
 
 footer {
     text-align: center;
-    padding: 20px;
-    background-color: #333;
-    color: #fff;
-    margin-top: 30px;
+    padding: 25px;
+    background-color: #1f1f2e; /* Dark footer */
+    color: #78909c; /* Muted text color */
+    margin-top: 40px;
+    font-size: 0.9rem;
+    border-top: 1px solid rgba(0, 229, 255, 0.1);
 }
 
 /* Responsive adjustments */
@@ -187,40 +245,52 @@ footer {
         flex-direction: column;
     }
     .summary-section .card {
-        flex-basis: auto; /* Allow cards to take full width */
-        margin-bottom: 15px;
+        flex-basis: auto;
+        margin-bottom: 20px;
     }
     main {
-        margin: 10px;
-        padding: 15px;
+        margin: 15px;
+        padding: 20px;
+    }
+    .transaction-list-section li {
+        flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    }
+    .transaction-list-section li .date {
+        margin-left: 0;
+        margin-top: 8px;
+        width: 100%;
+        text-align: left;
+    }
+    .transaction-list-section li button.delete-btn {
+        margin-left: auto; /* Push to the right */
+        margin-top: 10px;
     }
 }
 
 @media (max-width: 480px) {
     header h1 {
-        font-size: 1.5rem;
+        font-size: 1.8rem;
     }
     h2 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
     }
     .transaction-form-section input[type="text"],
     .transaction-form-section input[type="number"],
     .transaction-form-section input[type="date"],
     .transaction-form-section select,
     .transaction-form-section button[type="submit"] {
-        font-size: 0.9rem;
+        font-size: 0.95rem;
+        padding: 10px;
     }
     .transaction-list-section li {
-        flex-direction: column;
-        align-items: flex-start;
+        padding: 12px 15px;
     }
-    .transaction-list-section li .date {
-        margin-left: 0;
-        margin-top: 5px;
+    .transaction-list-section li .description,
+    .transaction-list-section li .amount {
+        font-size: 0.9rem;
     }
     .transaction-list-section li button.delete-btn {
-        margin-left: 0;
-        margin-top: 10px;
-        align-self: flex-end;
+        padding: 5px 10px;
+        font-size: 0.8rem;
     }
 } 
